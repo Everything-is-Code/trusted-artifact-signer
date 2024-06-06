@@ -1,0 +1,29 @@
+---
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  name: trusted-artifact-signer
+  namespace: openshift-gitops
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: in-cluster
+  template:
+    metadata:
+      name: trusted-artifact-signer-{{cluster}}
+    spec:
+      project: trusted-artifact-signer
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+      source:
+        repoURL: https://github.com/Everything-is-Code/trusted-artifact-signer.git
+        targetRevision: main
+        path: resources/
+      destination:
+        server: https://kubernetes.default.svc
